@@ -59,8 +59,89 @@ public class Simplex {
             tabla[i][vars + i] = 1; // variables de holgura
             tabla[i][columnas - 1] = b[i];
         }
+    
+
+     for (int j = 0; j < vars; j++) {
+            tabla[filas - 1][j] = -c[j];
+        }
+
+        mostrarTabla(tabla);
+
+        // Iteración Simplex
+        while (true) {
+            // Columna pivote
+            int colPiv = -1;
+            for (int j = 0; j < columnas - 1; j++) {
+                if (tabla[filas - 1][j] < 0) {
+                    colPiv = j;
+                    break;
+                }
+            }
+            if (colPiv == -1) break;
+
+            // Fila pivote
+            int filaPiv = -1;
+            double menor = 999999;
+            for (int i = 0; i < rest; i++) {
+                if (tabla[i][colPiv] > 0) {
+                    double ratio = tabla[i][columnas - 1] / tabla[i][colPiv];
+                    if (ratio < menor) {
+                        menor = ratio;
+                        filaPiv = i;
+                    }
+                }
+            }
+
+            double pivote = tabla[filaPiv][colPiv];
+
+            // Normalizar
+            for (int j = 0; j < columnas; j++) {
+                tabla[filaPiv][j] /= pivote;
+            }
+
+            // Hacer ceros
+            for (int i = 0; i < filas; i++) {
+                if (i != filaPiv) {
+                    double factor = tabla[i][colPiv];
+                    for (int j = 0; j < columnas; j++) {
+                        tabla[i][j] -= factor * tabla[filaPiv][j];
+                    }
+                }
+            }
+
+            mostrarTabla(tabla);
+        }
+
+        System.out.println("=== SOLUCIÓN FINAL ===");
+
+        for (int j = 0; j < vars; j++) {
+            boolean esBase = false;
+            int fila = -1;
+            for (int i = 0; i < rest; i++) {
+                if (tabla[i][j] == 1) {
+                    if (fila == -1) fila = i;
+                    else {
+                        fila = -1;
+                        break;
+                    }
+                } else if (tabla[i][j] != 0) {
+                    fila = -1;
+                    break;
+                }
+            }
+            if (fila != -1) System.out.println("x" + (j+1) + " = " + tabla[fila][columnas - 1]);
+            else System.out.println("x" + (j+1) + " = 0");
+        }
+
+        System.out.println("Z = " + tabla[filas - 1][columnas - 1]);
+
     }
     
 
+}
 
-    }
+
+    
+
+
+    
